@@ -9,6 +9,7 @@
 #include <stdio.h>		//for standard i/o (printf, perror)
 #include <pthread.h>	//for using threads
 #include <sched.h>		//for adding priorities to threads
+#include <unistd.h>		//for pause()
 //Methods:
 void *sense(void* arg);
 void *stateOutput(void* arg);
@@ -40,6 +41,14 @@ int main(int argc, char *argv[]) {
 	pthread_create(&stateOutputThread, NULL, stateOutput, NULL);
 	pthread_create(&userThread, NULL, userInterface, NULL);
 
+	//Wait for CTRL + c (all of the other threads will run until they
+	//finish or until CTRL + c is hit)
+	pause();
+
+	//The CPU will never get here, as the other threads are in infinite
+	//loops, and once CTRL + c is hit, all threads will terminate including
+	//this one. To prevent this, uses boolean variables in your loops
+	//(instead of constant "TRUE's"!)
 	printf("Goodbye World!\n");
 
 	return EXIT_SUCCESS;
@@ -62,7 +71,7 @@ void *sense(void* arg) {
 		scanf("%c", &state);
 
 		//If the state has changed, notify the stateOutput thread
-		if(temp != state){
+		if (temp != state) {
 			//notify stateOutput
 		}
 	}
