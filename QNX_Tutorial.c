@@ -16,6 +16,7 @@ void *stateOutput(void* arg);
 void *userInterface(void* arg);
 //Shared Variables:
 char state;
+short changed;
 pthread_cond_t stateCond;
 pthread_mutex_t stateMutex;
 //Constants and Defines:
@@ -64,12 +65,17 @@ int main(int argc, char *argv[]) {
 
 /*
  * Thread to sense if there has been a change in state.
+ *
+ * In terms of condition variables, this is a "signaling" thread.
  */
 void *sense(void* arg) {
-	char temp = 'x';
+	char temp = ' ';
 	while (TRUE) {
 		//Lock the 'state' mutex before modifying it
-		pthread_mutex_lock(&stateMutex);
+		//pthread_mutex_lock(&stateMutex);
+
+		//TODO: Only change state if a "real" state was entered!!!
+		//(make isReal() method)
 
 		//Scan a character into the global variable, 'state'
 		scanf("%c", &state);
@@ -80,10 +86,15 @@ void *sense(void* arg) {
 			continue;
 		}
 
+		//Lock the 'state' mutex before modifying it
+		pthread_mutex_lock(&stateMutex);
+
 		//If the state has changed, notify the stateOutput thread
 		//(Note: state ^ ' ' inverts the case of the character ie: x -> X)
 		if (temp != state && temp != (state ^ ' ')) {
-			printf("Notifying stateOutput...\n");
+			printf("Notifying stateOutput... %c\n", state);
+			//Change the variable the waiting thread is waiting on
+			changed = TRUE;
 			//Signal the waiting thread (stateOutput thread)
 			pthread_cond_signal(&stateCond);
 		}
@@ -99,8 +110,32 @@ void *sense(void* arg) {
 
 /*
  * Thread to output a change in state.
+ *
+ * In terms of condition variables, this is a "waiting" thread.
  */
 void *stateOutput(void* arg) {
+	changed = FALSE;
+	while (TRUE) {
+		//Lock the mutex before waiting
+		pthread_mutex_lock(&stateMutex);
+
+		//"If" the state hasn't changed, wait. (We use a "while" statement
+		//for safety, but it works the same as an if statement here.)
+		while (!changed) {
+			//Wait until signaled
+			pthread_cond_wait(&stateCond, &stateMutex);
+		}
+
+		//Output the new state!
+		printf("The state has changed! It is now: %c\n", state);
+
+		//Update the 'changed' variable to FALSE so that we wait for the
+		//next change
+		changed = FALSE;
+
+		//Unlock the mutex
+		pthread_mutex_unlock(&stateMutex);
+	}
 	return NULL;
 }
 
