@@ -109,6 +109,22 @@ void *sense(void* arg) {
 }
 
 /*
+ * Helper method checks if the state is an actual state.
+ */
+short isRealState(char s) {
+	short real = FALSE;
+
+	if (s == 'R' || s == 'r')//Ready
+		real = TRUE;
+	else if (s == 'N' || s == 'n')//Not Ready
+		real = TRUE;
+	else if (s == 'D' || s == 'd')//Dance mode
+		real = TRUE;
+
+	return real;
+}
+
+/*
  * Thread to output a change in state.
  *
  * In terms of condition variables, this is a "waiting" thread.
