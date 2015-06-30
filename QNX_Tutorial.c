@@ -13,6 +13,11 @@
 void *sense(void* arg);
 void *stateOutput(void* arg);
 void *userInterface(void* arg);
+//Shared Variables:
+char state;
+//Constants and Defines:
+#define TRUE 1
+#define FALSE 0
 
 /* --------------------------------------------------------------------------
  * ---------------------------------- MAIN ----------------------------------
@@ -21,6 +26,9 @@ void *userInterface(void* arg);
 int main(int argc, char *argv[]) {
 
 	printf("Hello World!\n");
+
+	//Initialize state:
+	state = 'N';
 
 	//Initialize thread ID's:
 	pthread_t sensorThread;
@@ -45,19 +53,32 @@ int main(int argc, char *argv[]) {
  * Thread to sense if there has been a change in state.
  */
 void *sense(void* arg) {
+	char temp = 'x';
+	while (TRUE) {
+		//Store the previous state in temp
+		temp = state;
+
+		//Scan a character into the global variable, state
+		scanf("%c", &state);
+
+		//If the state has changed, notify the stateOutput thread
+		if(temp != state){
+			//notify stateOutput
+		}
+	}
 	return NULL;
 }
 
 /*
  * Thread to output a change in state.
  */
-void *stateOutput(void* arg){
+void *stateOutput(void* arg) {
 	return NULL;
 }
 
 /*
  * Thread to output a user interface.
  */
-void *userInterface(void* arg){
+void *userInterface(void* arg) {
 	return NULL;
 }
