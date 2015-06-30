@@ -64,19 +64,13 @@ int main(int argc, char *argv[]) {
  * -------------------------------------------------------------------------- */
 
 /*
- * Thread to sense if there has been a change in state.
+ * "sense" thread senses if there has been a change in state.
  *
  * In terms of condition variables, this is a "signaling" thread.
  */
 void *sense(void* arg) {
 	char temp = ' ';
 	while (TRUE) {
-		//Lock the 'state' mutex before modifying it
-		//pthread_mutex_lock(&stateMutex);
-
-		//TODO: Only change state if a "real" state was entered!!!
-		//(make isReal() method)
-
 		//Scan a character into the global variable, 'state'
 		scanf("%c", &state);
 		delay(10);
@@ -109,7 +103,7 @@ void *sense(void* arg) {
 }
 
 /*
- * Helper method checks if the state is an actual state.
+ * "isRealState" helper method checks if the state is an actual state.
  */
 short isRealState(char s) {
 	short real = FALSE;
@@ -125,7 +119,7 @@ short isRealState(char s) {
 }
 
 /*
- * Thread to output a change in state.
+ * "stateOutput" thread outputs a change in state.
  *
  * In terms of condition variables, this is a "waiting" thread.
  */
@@ -156,7 +150,7 @@ void *stateOutput(void* arg) {
 }
 
 /*
- * Thread to output a user interface.
+ * "userInterface" thread outputs a user interface.
  */
 void *userInterface(void* arg) {
 	return NULL;
