@@ -81,7 +81,7 @@ void *sense(void* arg) {
 		//Lock the 'state' mutex before modifying it
 		pthread_mutex_lock(&stateMutex);
 
-		if(isRealState(tempState))
+		if (isRealState(tempState))
 			state = tempState;
 
 		//If the state has changed, notify the stateOutput thread
@@ -108,11 +108,11 @@ void *sense(void* arg) {
 short isRealState(char s) {
 	short real = FALSE;
 
-	if (s == 'R' || s == 'r')//Ready
+	if (s == 'R' || s == 'r')		//Ready
 		real = TRUE;
-	else if (s == 'N' || s == 'n')//Not Ready
+	else if (s == 'N' || s == 'n')		//Not Ready
 		real = TRUE;
-	else if (s == 'D' || s == 'd')//Dance mode
+	else if (s == 'D' || s == 'd')		//Dance mode
 		real = TRUE;
 
 	return real;
@@ -153,5 +153,15 @@ void *stateOutput(void* arg) {
  * "userInterface" thread outputs a user interface.
  */
 void *userInterface(void* arg) {
+	while (TRUE) {
+		if (state == 'n' || state == 'N') //Not ready
+			printf("___________________________________________________\n");
+		else if (state == 'r' || state == 'R') //Ready
+			printf("!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!\n");
+		else if (state == 'd' || state == 'D') //Dance mode
+			printf("/-\\_/-\\_/-\\_/-\\_/-\\_/-\\_/-\\_/-\\_/-\\_/-\\_/-\\_/-\\_/-\\\n");
+		delay(1000);
+	}
+
 	return NULL;
 }
