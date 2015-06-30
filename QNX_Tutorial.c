@@ -14,6 +14,7 @@
 void *sense(void* arg);
 void *stateOutput(void* arg);
 void *userInterface(void* arg);
+short isRealState(char s);
 //Shared Variables:
 char state;
 short changed;
@@ -69,24 +70,23 @@ int main(int argc, char *argv[]) {
  * In terms of condition variables, this is a "signaling" thread.
  */
 void *sense(void* arg) {
-	char temp = ' ';
+	char prevState = ' ';
 	while (TRUE) {
-		//Scan a character into the global variable, 'state'
-		scanf("%c", &state);
+		//Scan for a character, but don't change the global variable
+		//'state' until we know the character scanned is a "real" state
+		char tempState;
+		scanf("%c", &tempState);
 		delay(10);
-
-		//Avoid a bug where scanf grabs a newline on the second loop
-		if (state == '\n') {
-			continue;
-		}
 
 		//Lock the 'state' mutex before modifying it
 		pthread_mutex_lock(&stateMutex);
 
+		if(isRealState(tempState))
+			state = tempState;
+
 		//If the state has changed, notify the stateOutput thread
 		//(Note: state ^ ' ' inverts the case of the character ie: x -> X)
-		if (temp != state && temp != (state ^ ' ')) {
-			printf("Notifying stateOutput... %c\n", state);
+		if (prevState != state && prevState != (state ^ ' ')) {
 			//Change the variable the waiting thread is waiting on
 			changed = TRUE;
 			//Signal the waiting thread (stateOutput thread)
@@ -94,7 +94,7 @@ void *sense(void* arg) {
 		}
 
 		//Store the current state in temp
-		temp = state;
+		prevState = state;
 
 		//Unlock the mutex
 		pthread_mutex_unlock(&stateMutex);
