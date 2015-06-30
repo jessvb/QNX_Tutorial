@@ -16,6 +16,8 @@ void *stateOutput(void* arg);
 void *userInterface(void* arg);
 //Shared Variables:
 char state;
+pthread_cond_t stateCond;
+pthread_mutex_t stateMutex;
 //Constants and Defines:
 #define TRUE 1
 #define FALSE 0
@@ -28,10 +30,12 @@ int main(int argc, char *argv[]) {
 
 	printf("Hello World!\n");
 
-	//Initialize state:
+	//Initialize variables:
 	state = 'N';
+	pthread_cond_init(&stateCond, NULL);
+	pthread_mutex_init(&stateMutex, NULL);
 
-	//Initialize thread ID's:
+	//Declare thread ID's:
 	pthread_t sensorThread;
 	pthread_t stateOutputThread;
 	pthread_t userThread;
