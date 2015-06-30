@@ -108,11 +108,11 @@ void *sense(void* arg) {
 short isRealState(char s) {
 	short real = FALSE;
 
-	if (s == 'R' || s == 'r')		//Ready
+	if (s == 'R' || s == 'r') //Ready
 		real = TRUE;
-	else if (s == 'N' || s == 'n')		//Not Ready
+	else if (s == 'N' || s == 'n') //Not Ready
 		real = TRUE;
-	else if (s == 'D' || s == 'd')		//Dance mode
+	else if (s == 'D' || s == 'd') //Dance mode
 		real = TRUE;
 
 	return real;
@@ -137,7 +137,13 @@ void *stateOutput(void* arg) {
 		}
 
 		//Output the new state!
-		printf("The state has changed! It is now: %c\n", state);
+		printf("The state has changed! It is now in ");
+		if (state == 'n' || state == 'N') //Not ready
+			printf("Not Ready State\n");
+		else if (state == 'r' || state == 'R') //Ready
+			printf("Ready State\n");
+		else if (state == 'd' || state == 'D') //Dance mode
+			printf("Dance Mode\n");
 
 		//Update the 'changed' variable to FALSE so that we wait for the
 		//next change
