@@ -64,17 +64,25 @@ int main(int argc, char *argv[]) {
 void *sense(void* arg) {
 	char temp = 'x';
 	while (TRUE) {
-		//Store the previous state in temp
-		temp = state;
-
-		//Scan a character into the global variable, state
+		//Scan a character into the global variable, 'state'
 		scanf("%c", &state);
+		delay(10);
+
+		//Avoid a bug where scanf grabs a newline on the second loop
+		if (state == '\n') {
+			continue;
+		}
 
 		//If the state has changed, notify the stateOutput thread
-		if (temp != state) {
-			//notify stateOutput
+		//(Note: state ^ ' ' inverts the case of the character ie: x -> X)
+		if (temp != state && temp != (state ^ ' ')) {
+			printf("Notifying stateOutput...\n");
+			//Notify stateOutput
 		}
-		delay(10);
+
+		//Store this state in temp
+		temp = state;
+
 	}
 	return NULL;
 }
