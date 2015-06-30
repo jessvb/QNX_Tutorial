@@ -9,7 +9,7 @@
 #include <stdio.h>		//for standard i/o (printf, perror)
 #include <pthread.h>	//for using threads
 #include <sched.h>		//for adding priorities to threads
-#include <unistd.h>		//for pause()
+#include <unistd.h>		//for pause(), delay(), etc.
 //Methods:
 void *sense(void* arg);
 void *stateOutput(void* arg);
@@ -74,6 +74,7 @@ void *sense(void* arg) {
 		if (temp != state) {
 			//notify stateOutput
 		}
+		delay(10);
 	}
 	return NULL;
 }
