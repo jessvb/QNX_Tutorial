@@ -68,6 +68,9 @@ int main(int argc, char *argv[]) {
 void *sense(void* arg) {
 	char temp = 'x';
 	while (TRUE) {
+		//Lock the 'state' mutex before modifying it
+		pthread_mutex_lock(&stateMutex);
+
 		//Scan a character into the global variable, 'state'
 		scanf("%c", &state);
 		delay(10);
@@ -81,12 +84,15 @@ void *sense(void* arg) {
 		//(Note: state ^ ' ' inverts the case of the character ie: x -> X)
 		if (temp != state && temp != (state ^ ' ')) {
 			printf("Notifying stateOutput...\n");
-			//Notify stateOutput
+			//Signal the waiting thread (stateOutput thread)
+			pthread_cond_signal(&stateCond);
 		}
 
-		//Store this state in temp
+		//Store the current state in temp
 		temp = state;
 
+		//Unlock the mutex
+		pthread_mutex_unlock(&stateMutex);
 	}
 	return NULL;
 }
